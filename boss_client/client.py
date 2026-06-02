@@ -1,9 +1,6 @@
 import datetime
-import time
-
 import httpx
-
-from urllib.parse import urljoin
+import time
 
 
 class BossClient:
@@ -42,29 +39,27 @@ class BossClient:
 
         headers = {}
         if self.authorization_header is not None:
-            headers['Authorization'] = self.authorization_header
+            headers["Authorization"] = self.authorization_header
 
         self.client = httpx.Client(headers=headers)
 
     def hent_access_token(self):
-        body = (
-            f"grant_type=client_credentials&client_id={self.client_id}&scope={self.api_url}&client_secret={self.client_secret}"
-        )
-        headers = {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        }
+        body = f"grant_type=client_credentials&client_id={self.client_id}&scope={self.api_url}&client_secret={self.client_secret}"
+        headers = {"Content-Type": "application/x-www-form-urlencoded"}
         response = httpx.post(self.login_url, content=body, headers=headers)
         response.raise_for_status()
 
         token_data = response.json()
-        self.access_token = token_data.get('access_token')
-        self.token_type = token_data.get('token_type', 'Bearer')
+        self.access_token = token_data.get("access_token")
+        self.token_type = token_data.get("token_type", "Bearer")
 
-        expires_in = token_data.get('expires_in')
+        expires_in = token_data.get("expires_in")
         if expires_in is not None:
             expires_in = int(expires_in)
             buffer_seconds = max(expires_in - 20, 0)
-            self.access_token_expiration = datetime.datetime.utcnow() + datetime.timedelta(seconds=buffer_seconds)
+            self.access_token_expiration = (
+                datetime.datetime.utcnow() + datetime.timedelta(seconds=buffer_seconds)
+            )
         else:
             self.access_token_expiration = None
 
@@ -91,31 +86,30 @@ class BossClient:
         if response is not None:
             response.raise_for_status()
 
-        raise RuntimeError("Failed to get a 200 response from GenerateGraceReports within one hour.")
-        
+        raise RuntimeError(
+            "Failed to get a 200 response from GenerateGraceReports within one hour."
+        )
 
     def hent_systemer(self):
         self._ensure_access_token()
-        response = self.client.get(
-            f"{self.base_url}/api/rpa/SystemsToBeClosed"
-        )
+        response = self.client.get(f"{self.base_url}/api/rpa/SystemsToBeClosed")
 
         if response.status_code == 200:
             return response.json()
-        
+
         if response is not None:
             response.raise_for_status()
         return response.json()
 
-    def marker_bruger_som_slettet(self, user_id : str):
+    def marker_bruger_som_slettet(self, user_id: str):
         self._ensure_access_token()
-        
+
         response = self.client.get(
             f"{self.base_url}/api/rpa/MarkSystemAsClosedForUser/{user_id}"
         )
-        if response .status_code == 200:
+        if response.status_code == 200:
             return response
-        
+
         if response is not None:
             response.raise_for_status()
         return response

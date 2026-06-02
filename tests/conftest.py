@@ -11,5 +11,5 @@ def boss_client():
         api_url=os.getenv("API_URL"),
         client_id=os.getenv("CLIENT_ID"),
         client_secret=os.getenv("CLIENT_SECRET"),
-        base_url=os.getenv("BASE_URL")
+        base_url=os.getenv("BASE_URL"),
     )
