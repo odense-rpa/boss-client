@@ -94,6 +94,28 @@ class BossClient:
         raise RuntimeError("Failed to get a 200 response from GenerateGraceReports within one hour.")
         
 
-    def marker_bruger_som_slettet(self):
+    def hent_systemer(self):
         self._ensure_access_token()
-        pass
+        response = self.client.get(
+            f"{self.base_url}/api/rpa/SystemsToBeClosed"
+        )
+
+        if response.status_code == 200:
+            return response.json()
+        
+        if response is not None:
+            response.raise_for_status()
+        return response.json()
+
+    def marker_bruger_som_slettet(self, user_id : str):
+        self._ensure_access_token()
+        
+        response = self.client.get(
+            f"{self.base_url}/api/rpa/MarkSystemAsClosedForUser/{user_id}"
+        )
+        if response .status_code == 200:
+            return response
+        
+        if response is not None:
+            response.raise_for_status()
+        return response
