@@ -1,5 +1,5 @@
 [project]
-name = "process-template"
+name = "boss-client"
 version = "0.3.0"
 description = "Add your description here"
 readme = "README.md"
